@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
 import javax.annotation.Resource;
 
@@ -47,21 +49,28 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private CacheClient cacheClient;
     
+        // 本地 Caffeine 缓存，缓存 shop 对象，Key 为 shopId
+        private final Cache<Long, Shop> localCache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
+    
     @Override
     public Result queryById(Long id) {
-        //缓存穿透
-        // Shop shop = cacheClient.queryWithPassThrough(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
+        // 1. 本地缓存优先
+        Shop shop = localCache.getIfPresent(id);
+        if (shop != null) {
+            return Result.ok(shop);
+        }
 
-        //互斥锁解决缓存击穿
-        // Shop shop = queryWithMutex(id);
-
-        //逻辑过期解决缓存击穿
-        Shop shop =cacheClient.queryWithPassThrough(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
-
+        // 2. 本地没有，走 Redis -> DB 的统一缓存读取逻辑（通过 CacheClient）
+        shop = cacheClient.queryWithPassThrough(CACHE_SHOP_KEY, id, Shop.class, this::getById, CACHE_SHOP_TTL, TimeUnit.MINUTES);
         if (shop == null) {
             return Result.fail("商铺不存在");
         }
 
+        // 3. 将查询到的数据放入本地缓存
+        localCache.put(id, shop);
         return Result.ok(shop);
     }
 
@@ -203,7 +212,10 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
             return Result.fail("店铺ID不能为空");
         }
         updateById(shop);
+        // 删除 Redis 缓存
         stringRedisTemplate.delete(CACHE_SHOP_KEY + id);
+        // 同步删除本地缓存
+        localCache.invalidate(id);
         return Result.ok();
     }
 }
