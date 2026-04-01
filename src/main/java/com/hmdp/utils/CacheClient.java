@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
+import javax.annotation.Resource;
 import static com.hmdp.utils.RedisConstants.CACHE_NULL_TTL;
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_KEY;
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_TTL;
@@ -22,6 +23,8 @@ public class CacheClient {
 
 
     private final StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private BloomFilterHelper bloomFilterHelper;
     public CacheClient(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
     }
@@ -50,15 +53,25 @@ public class CacheClient {
             // 3.存在，直接返回
             return JSONUtil.toBean(json, type);
         }
-        //判断商户缓存是否命中空字符串
+        // 判断缓存是否命中空字符串
         if (json != null) {
-            return null;
+            // json 为空字符串表示此前缓存了空值；这里我们已改用布隆过滤器来防穿透，仍保留兼容逻辑：
+            if (json.length() == 0) {
+                return null;
+            }
         }
         // 4.不存在，根据id查询数据库
+        // 在查询数据库前，先用布隆过滤器判断是否可能存在，若不可能则直接返回 null，避免穿透
+        if (bloomFilterHelper != null && bloomFilterHelper.isAvailable() && id instanceof Long) {
+            Long lid = (Long) id;
+            if (!bloomFilterHelper.mightContain(lid)) {
+                return null;
+            }
+        }
+
         T t = dbFallback.apply(id);
         if(t == null) {
-            // 5.数据库中不存在，缓存空字符串，防止缓存穿透
-            stringRedisTemplate.opsForValue().set(key, "", CACHE_NULL_TTL, TimeUnit.MINUTES);
+            // 5.数据库中不存在，使用布隆过滤器已进行了可能性判断，不再写入空字符串到 Redis
             return null;
         }
         // 6.数据库中存在，写入redis，设置过期时间

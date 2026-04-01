@@ -49,11 +49,13 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private CacheClient cacheClient;
     
-        // 本地 Caffeine 缓存，缓存 shop 对象，Key 为 shopId
-        private final Cache<Long, Shop> localCache = Caffeine.newBuilder()
-            .maximumSize(1000)
-            .expireAfterWrite(10, TimeUnit.MINUTES)
-            .build();
+            // 本地 Caffeine 缓存，缓存 shop 对象，Key 为 shopId
+            // 最大容量 10000 条，写入后过期 10 分钟，访问后过期 5 分钟
+            private final Cache<Long, Shop> localCache = Caffeine.newBuilder()
+                .maximumSize(10000)
+                .expireAfterWrite(10, TimeUnit.MINUTES)
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .build();
     
     @Override
     public Result queryById(Long id) {

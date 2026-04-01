@@ -25,6 +25,8 @@ public class ShopController {
 
     @Resource
     public IShopService shopService;
+    @Resource
+    private com.hmdp.utils.BloomFilterHelper bloomFilterHelper;
 
     /**
      * 根据id查询商铺信息
@@ -45,6 +47,10 @@ public class ShopController {
     public Result saveShop(@RequestBody Shop shop) {
         // 写入数据库
         shopService.save(shop);
+        // 新增店铺后将 id 添加到布隆过滤器
+        if (shop.getId() != null) {
+            bloomFilterHelper.put(shop.getId());
+        }
         // 返回店铺id
         return Result.ok(shop.getId());
     }
