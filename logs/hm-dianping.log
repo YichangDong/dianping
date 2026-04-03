@@ -1,0 +1,30 @@
+2026-04-02 11:26:25.761 INFO  com.hmdp.HmDianPingApplication - Starting HmDianPingApplication on LAPTOP-DBUOLC5N with PID 5672 (D:\Learning\Java\projects\hm-dianping\target\classes started by Finch in D:\Learning\Java\projects\hm-dianping)
+2026-04-02 11:26:25.769 DEBUG com.hmdp.HmDianPingApplication - Running with Spring Boot v2.3.12.RELEASE, Spring v5.2.15.RELEASE
+2026-04-02 11:26:25.770 INFO  com.hmdp.HmDianPingApplication - No active profile set, falling back to default profiles: default
+2026-04-02 11:26:26.227 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode!
+2026-04-02 11:26:26.227 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-04-02 11:26:26.254 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 16ms. Found 0 Redis repository interfaces.
+2026-04-02 11:26:26.727 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8081 (http)
+2026-04-02 11:26:26.736 INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8081"]
+2026-04-02 11:26:26.736 INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-04-02 11:26:26.736 INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.46]
+2026-04-02 11:26:26.814 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-04-02 11:26:26.814 INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 992 ms
+2026-04-02 11:26:27.471 INFO  org.redisson.Version - Redisson 3.16.4
+2026-04-02 11:26:27.667 INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for localhost/127.0.0.1:6379
+2026-04-02 11:26:27.681 INFO  o.r.c.pool.MasterConnectionPool - 24 connections initialized for localhost/127.0.0.1:6379
+2026-04-02 11:26:27.736 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-04-02 11:26:27.868 INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-04-02 11:26:27.879 DEBUG c.hmdp.mapper.ShopMapper.selectList - ==>  Preparing: SELECT id,name,type_id,images,area,address,x,y,avg_price,sold,comments,score,open_hours,create_time,update_time FROM tb_shop
+2026-04-02 11:26:27.896 DEBUG c.hmdp.mapper.ShopMapper.selectList - ==> Parameters: 
+2026-04-02 11:26:27.911 DEBUG c.hmdp.mapper.ShopMapper.selectList - <==      Total: 14
+2026-04-02 11:26:27.951 INFO  com.hmdp.utils.BloomFilterHelper - Redisson BloomFilter initialized
+2026-04-02 11:26:28.168 INFO  o.s.s.c.ThreadPoolTaskExecutor - Initializing ExecutorService 'applicationTaskExecutor'
+2026-04-02 11:26:28.445 INFO  o.s.s.c.ThreadPoolTaskScheduler - Initializing ExecutorService 'taskScheduler'
+2026-04-02 11:26:28.481 INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8081"]
+2026-04-02 11:26:28.512 INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8081 (http) with context path ''
+2026-04-02 11:26:28.535 INFO  com.hmdp.HmDianPingApplication - Started HmDianPingApplication in 2.987 seconds (JVM running for 3.382)
+2026-04-02 11:26:30.426 INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-02 11:26:30.426 INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-04-02 11:26:30.430 INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 4 ms
+2026-04-02 11:26:30.712 DEBUG c.hmdp.service.impl.UserServiceImpl - 发送短信验证码成功，验证码：443982
