@@ -281,4 +281,18 @@ CREATE TABLE `tb_voucher_order`  (
 -- Records of tb_voucher_order
 -- ----------------------------
 
+-- ----------------------------
+-- Table structure for tb_seckill_outbox
+-- ----------------------------
+DROP TABLE IF EXISTS `tb_seckill_outbox`;
+CREATE TABLE `tb_seckill_outbox`  (
+  `id` bigint(20) NOT NULL COMMENT '消息ID，同订单ID',
+  `user_id` bigint(20) UNSIGNED NOT NULL COMMENT '下单用户id',
+  `voucher_id` bigint(20) UNSIGNED NOT NULL COMMENT '代金券id',
+  `status` tinyint(1) UNSIGNED NOT NULL DEFAULT 0 COMMENT '0-INIT, 1-SUCCESS, 2-FAIL',
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Compact;
+
 SET FOREIGN_KEY_CHECKS = 1;

@@ -6,6 +6,7 @@ import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DuplicateKeyException;
@@ -17,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.VoucherOrderMessage;
+import com.hmdp.entity.SeckillOutbox;
 import com.hmdp.entity.VoucherOrder;
 import com.hmdp.mapper.VoucherOrderMapper;
+import com.hmdp.service.ISeckillOutboxService;
 import com.hmdp.service.IVoucherOrderService;
 import com.hmdp.service.IVoucherService;
 import com.hmdp.utils.MqConstants;
@@ -49,6 +52,9 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 
     @Resource
     private RabbitTemplate rabbitTemplate;
+
+    @Resource
+    private ISeckillOutboxService seckillOutboxService;
 
     private static final DefaultRedisScript<Long> SECKILL_SCRIPT;
     private static final DefaultRedisScript<Long> SECKILL_ROLLBACK_SCRIPT;
@@ -88,21 +94,32 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         }
 
         try {
-            // 资格校验通过后，发送异步下单消息
+            // 资格校验通过后，先落库本地消息表(Outbox)
+            SeckillOutbox outbox = new SeckillOutbox();
+            outbox.setId(orderId);
+            outbox.setUserId(userId);
+            outbox.setVoucherId(voucherId);
+            outbox.setStatus(0); // 0-INIT
+            seckillOutboxService.save(outbox);
+
+            // 发送异步下单消息，带有相关数据以便回调确认
             VoucherOrderMessage message = new VoucherOrderMessage(orderId, userId, voucherId);
+            CorrelationData correlationData = new CorrelationData(String.valueOf(orderId));
             rabbitTemplate.convertAndSend(
                     MqConstants.SECKILL_ORDER_EXCHANGE,
                     MqConstants.SECKILL_ORDER_ROUTING_KEY,
-                    message);
+                    message,
+                    correlationData);
             return Result.ok(orderId);
-        } catch (AmqpException e) {
-            // 消息发送失败：回滚Redis预扣，避免库存与下单标记长期不一致
-            log.error("发送下单消息失败, orderId={}", orderId, e);
+        } catch (Exception e) {
+            // 本地落库或消息发送异常：回滚Redis预扣，避免长期不一致
+            log.error("尝试落库并发送下单消息失败, orderId={}", orderId, e);
             stringRedisTemplate.execute(
                     SECKILL_ROLLBACK_SCRIPT,
                     Collections.emptyList(),
                     voucherId.toString(),
                     userId.toString());
+            // 如果Outbox落库失败，事务会回滚/脏数据不产生（这里若有完整事务更好，但因无Spring事务注解，暂依靠兜底回滚）
             return Result.fail("抢购人数过多，请稍后重试");
         }
     }
