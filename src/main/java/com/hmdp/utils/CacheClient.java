@@ -104,19 +104,35 @@ public class CacheClient {
         boolean isLock = tryLock(lockKey);
         // 5.2.判断是否获取锁成功
         if (isLock) {
-            // 5.3.成功，开启独立线程，实现缓存重建
-            CACHE_REBUILD_EXECUTOR.submit(() -> {
-                try {
-                    // 重建缓存
-                    T newT = dbFallback.apply(id);
-                    this.setWithLogicalExpire(key, newT, time, unit);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    // 释放锁
-                    unLock(lockKey);
+            try {
+                // 获取锁成功后进行双重检查，防止重复重建
+                String json2 = stringRedisTemplate.opsForValue().get(key);
+                if (StrUtil.isNotBlank(json2)) {
+                    RedisData redisData2 = JSONUtil.toBean(json2, RedisData.class);
+                    T newT = JSONUtil.toBean((String) redisData2.getData(), type);
+                    if (redisData2.getExpireTime().isAfter(LocalDateTime.now())) {
+                        // 已被其他线程重建，释放锁并直接返回最新数据
+                        unLock(lockKey);
+                        return newT;
+                    }
                 }
-            });
+                // 仍旧过期，开启独立线程重建缓存
+                CACHE_REBUILD_EXECUTOR.submit(() -> {
+                    try {
+                        T newT = dbFallback.apply(id);
+                        this.setWithLogicalExpire(key, newT, time, unit);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    } finally {
+                        // 释放锁
+                        unLock(lockKey);
+                    }
+                });
+            } catch (Exception e) {
+                // 出现异常时，确保释放锁后抛出
+                unLock(lockKey);
+                throw e;
+            }
         }
         return t;
     }
