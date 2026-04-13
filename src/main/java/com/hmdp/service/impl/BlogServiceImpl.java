@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static com.hmdp.utils.RedisConstants.BLOG_LIKED_KEY;
 import static com.hmdp.utils.RedisConstants.FEED_KEY;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;

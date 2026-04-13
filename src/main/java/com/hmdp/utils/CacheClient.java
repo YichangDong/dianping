@@ -6,10 +6,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import javax.annotation.Resource;
-import static com.hmdp.utils.RedisConstants.CACHE_NULL_TTL;
+
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_KEY;
 import static com.hmdp.utils.RedisConstants.LOCK_SHOP_TTL;
 

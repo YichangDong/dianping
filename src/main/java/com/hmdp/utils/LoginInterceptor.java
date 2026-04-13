@@ -7,7 +7,6 @@ import cn.hutool.core.util.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import org.apache.ibatis.type.Alias;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -15,9 +14,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @AllArgsConstructor
 @NoArgsConstructor

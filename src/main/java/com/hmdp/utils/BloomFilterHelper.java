@@ -3,8 +3,8 @@ package com.hmdp.utils;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
-import javax.annotation.PostConstruct;
 
+import jakarta.annotation.PostConstruct;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.RKeys;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 /**

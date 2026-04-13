@@ -2,10 +2,9 @@ package com.hmdp.service.impl;
 
 import java.util.Collections;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
@@ -130,7 +129,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         long userId = voucherOrder.getUserId();
 
         // 再次校验一人一单，防止消息重复消费导致重复下单
-        Integer count = query()
+        Long count = query()
                 .eq("voucher_id", voucherOrder.getVoucherId())
                 .eq("user_id", userId)
                 .count();

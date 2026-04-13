@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 
 @Slf4j
 @Configuration
@@ -44,12 +44,12 @@ public class RabbitTemplateConfig implements ApplicationContextAware {
             }
         });
 
-        // 设置ReturnCallback (Spring AMQP 2.x)
-        rabbitTemplate.setReturnCallback((message, replyCode, replyText, exchange, routingKey) -> {
+        // 设置ReturnsCallback (Spring AMQP 3.x)
+        rabbitTemplate.setReturnsCallback(returned -> {
             // 消息路由到队列失败（交换机收到了但没进队列）
             log.error("消息路由失败, 状态码: {}, 描述: {}, 交换机: {}, 路由键: {}",
-                    replyCode, replyText, exchange, routingKey);
-            // 由于ReturnCallback没有自带correlationData，通常这被认为是由于配置导致的严重故障
+                    returned.getReplyCode(), returned.getReplyText(), returned.getExchange(), returned.getRoutingKey());
+            // 由于ReturnsCallback没有自带correlationData，通常这被认为是由于配置导致的严重故障
         });
     }
 }

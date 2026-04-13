@@ -2,13 +2,11 @@ package com.hmdp.service.impl;
 
 import java.io.IOException;
 
-import javax.annotation.Resource;
-
+import jakarta.annotation.Resource;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +33,14 @@ public class VoucherOrderMqConsumer {
         long userId = message.getUserId();
         long orderId = message.getOrderId();
 
-        RLock lock = redissonClient.getLock("lock:order:" + userId);
+        // 使用三个独立的锁对象来模拟/实现联锁（MultiLock/RedLock思想）
+        RLock lock1 = redissonClient.getLock("lock:order:node1:" + userId);
+        RLock lock2 = redissonClient.getLock("lock:order:node2:" + userId);
+        RLock lock3 = redissonClient.getLock("lock:order:node3:" + userId);
+
+        // 获取联锁
+        RLock lock = redissonClient.getMultiLock(lock1, lock2, lock3);
+
         boolean isLock = lock.tryLock();
         if (!isLock) {
             log.warn("重复下单消息(未获取到分布式锁)，userId={}", userId);

@@ -3,7 +3,7 @@ package com.hmdp.service.impl;
 import java.io.IOException;
 import java.util.Collections;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;

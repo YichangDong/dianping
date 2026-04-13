@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.util.List;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import static com.hmdp.utils.RedisConstants.CACHE_SHOP_TYPE_KEY;
 
 import org.springframework.data.redis.core.StringRedisTemplate;

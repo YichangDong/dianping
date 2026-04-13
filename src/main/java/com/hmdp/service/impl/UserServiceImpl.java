@@ -17,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 
 import static com.hmdp.utils.SystemConstants.USER_NICK_NAME_PREFIX;
 import static com.hmdp.utils.RedisConstants.LOGIN_CODE_KEY;
