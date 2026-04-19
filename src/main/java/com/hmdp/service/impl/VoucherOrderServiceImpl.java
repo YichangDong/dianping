@@ -23,8 +23,8 @@ import com.hmdp.mapper.VoucherOrderMapper;
 import com.hmdp.service.ISeckillOutboxService;
 import com.hmdp.service.IVoucherOrderService;
 import com.hmdp.service.IVoucherService;
+import com.hmdp.utils.IdWorker;
 import com.hmdp.utils.MqConstants;
-import com.hmdp.utils.RedisIdWorker;
 import com.hmdp.utils.UserHolder;
 
 
@@ -47,7 +47,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private IVoucherService voucherService;
 
     @Resource
-    private RedisIdWorker redisIdWorker;
+    private IdWorker idWorker;
 
     @Resource
     private RabbitTemplate rabbitTemplate;
@@ -74,7 +74,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     public Result seckillVoucher(Long voucherId) {
         // 获取当前用户并生成订单ID（先响应订单号，后异步落库）
         Long userId = UserHolder.getUser().getId();
-        long orderId = redisIdWorker.nextId("order");
+        long orderId = idWorker.nextId("order");
 
         // 执行Lua脚本：原子完成库存校验 + 一人一单校验 + 预扣库存
         Long executeResult = stringRedisTemplate.execute(

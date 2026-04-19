@@ -1,24 +1,22 @@
-# 代码使用说明
-项目代码包含2个分支：
-- master : 主分支，包含完整版代码，作为大家的编码参考使用
-- init : 初始化分支，实战篇的初始代码，建议大家以这个分支作为自己开发的基础代码
-## 1.下载
-克隆完整项目
-```git
-git clone https://gitee.com/huyi612/hm-dianping.git
-```
-切换分支
-```git
-git checkout init
-```
+<div align="center">
+  <h1>AI+本地生活服务平台</h1>
+  <p>
+    <img src="https://img.shields.io/badge/Spring%20Boot-3.4.4-6DB33F" alt="Spring Boot">
+    <img src="https://img.shields.io/badge/Java-17-007396" alt="Java">
+    <img src="https://img.shields.io/badge/Spring%20AI-1.0.3-412991" alt="Spring AI">
+    <img src="https://img.shields.io/badge/MyBatis--Plus-3.5.6-1F88E5" alt="MyBatis-Plus">
+    <img src="https://img.shields.io/badge/Redisson-3.27.1-BB1E10" alt="Redisson">
+    <img src="https://img.shields.io/badge/MySQL%20Connector-8.0.31-4479A1" alt="MySQL Connector">
+    <img src="https://img.shields.io/badge/Redis-8.4.0-D82C20" alt="Redis">
+    <img src="https://img.shields.io/badge/RabbitMQ%20Spring-3.13.7-FF6600" alt="RabbitMQ Spring">
+  </p>
+</div>
 
-## 2.常见问题
-部分同学直接使用了master分支项目来启动，控制台会一直报错:
-```
-NOGROUP No such key 'stream.orders' or consumer group 'g1' in XREADGROUP with GROUP option
-```
-这是因为我们完整版代码会尝试访问Redis，连接Redis的Stream。建议同学切换到init分支来开发，如果一定要运行master分支，请先在Redis运行一下命令：
-```text
-XGROUP CREATE stream.orders g1 $ MKSTREAM
-```
-hi this dong yichang
+AI+本地生活服务平台 是一个类“大众点评”的本地生活服务平台。  
+### 我在保留原本点评、优惠券、秒杀、支付这些核心业务链路的基础上，新增了：
+
+- 使用布隆过滤器预防缓存穿透
+- 使用滑动窗口策略进行限流
+- 使用RabbitMQ进行异步下单
+- 利用RabbitMQ的延迟消息实现定时关闭订单功能
+- 使用分布式锁解决解决支付回调与超时关单状态下的并发问题

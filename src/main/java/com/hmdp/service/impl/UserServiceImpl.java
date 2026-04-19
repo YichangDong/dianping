@@ -83,8 +83,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
 
 
-            // 6. 返回登录结果
-            return Result.ok();
+            // 6. 返回 token，前端或压测工具后续通过 authorization 请求头携带
+            return Result.ok(token);
     }
 
     private User createUserWithPhone(String phone) {

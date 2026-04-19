@@ -41,11 +41,6 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.setStatus(401);
             return false;
         }
-        // 5.存在，保存用户信息到ThreadLocal
-        UserDTO userDTO = BeanUtil.fillBeanWithMap(userMap, new UserDTO(), false);
-        UserHolder.saveUser(userDTO);
-        // 6.刷新token有效期
-        stringRedisTemplate.expire(key, RedisConstants.LOGIN_USER_TTL, TimeUnit.MINUTES);
         return true;
 
     }

@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Resource;
 
 @Slf4j
 @Configuration
